@@ -39,3 +39,9 @@ pip install -r requirements.txt
 - Cleaning exported mailing lists or CRM exports before import.
 - Normalizing messy spreadsheets from clients or team members.
 - Preparing CSV datasets for analytics or BI tools.
+
+
+## 🚀 Ready-made Automation Pack
+If you're looking for a plug-and-play solution, check out my automation pack on Gumroad:
+👉 https://khalidelfakir.gumroad.com
+
