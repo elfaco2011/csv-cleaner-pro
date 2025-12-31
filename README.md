@@ -1,14 +1,24 @@
-# CSV Cleaner PRO
+# CSV Data Cleaning & Processing Automation Bot
 
-General-purpose CSV cleaning utility that normalizes headers and rows, removes empty lines, and deduplicates records.
+## 🔍 Problem
+Raw CSV files often contain inconsistent formatting, missing values, and invalid data that make analysis and automation difficult.
 
-## What it does
+## ✅ Solution
+This Python automation bot cleans, normalizes, and processes CSV datasets, making them ready for analysis, reporting, or further automation workflows.
+
+## 🚀 Features
 - Reads `examples/sample_input.csv`.
 - Trims whitespace from headers and cells.
 - Normalizes row length (pads or truncates columns).
 - Removes fully empty rows.
 - Removes exact duplicate rows.
 - Writes a cleaned dataset to `examples/sample_output.csv`.
+
+## 🛠 Tech Stack
+- Python
+- CSV processing
+- Data validation
+- Automation workflows
 
 ## How to run (DEMO)
 ```bash
@@ -39,6 +49,11 @@ pip install -r requirements.txt
 - Cleaning exported mailing lists or CRM exports before import.
 - Normalizing messy spreadsheets from clients or team members.
 - Preparing CSV datasets for analytics or BI tools.
+
+## 📦 Ready-made Automation Pack
+If you're looking for a plug-and-play solution, check out my automation pack on Gumroad:
+👉 https://khalidelfakir.gumroad.com
+
 
 
 ## 🚀 Ready-made Automation Pack
