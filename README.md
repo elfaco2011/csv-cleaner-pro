@@ -24,7 +24,8 @@ Bob,bob@example.com,USA
 
 ## What it does
 - Trims whitespace from header names and from every cell.
-- Pads short rows with empty cells and truncates long rows to the header length (extra columns are dropped).
+- Pads short rows with empty cells. Extra cells beyond the header are dropped only if they are empty.
+- Rows whose extra cells contain data are not truncated: they are left out of the cleaned file and written to `rejected_rows.csv` (with their line number), and a warning reports how many.
 - Removes rows where every cell is empty.
 - Removes exact duplicate rows (compared after trimming), keeping the first occurrence.
 
@@ -36,12 +37,18 @@ pip install -r requirements.txt   # nothing to install, kept for consistency
 python src/main.py
 ```
 
-The cleaned file is written to `examples/sample_output.csv`.
+The cleaned file is written to `output/cleaned.csv` (git-ignored); rejected rows, if any, go to `output/rejected_rows.csv`. To use other files:
+
+```bash
+python src/main.py --input path/to/data.csv --output path/to/cleaned.csv
+```
+
+When there are rejected rows, `rejected_rows.csv` is written next to the `--output` file.
 
 ## Sample data
 `examples/sample_input.csv` contains a small contact list with padded values, a duplicate and an empty row.
-If the file is missing, the script recreates it before running.
+If the file is missing and no `--input` is given, the script recreates it before running.
 
 ## Adapting it to your data
-Replace `examples/sample_input.csv` with your own CSV (first row must be the header), or change `INPUT_PATH` and `OUTPUT_PATH` at the top of `src/main.py`.
-Any column layout works; rows longer than the header lose their extra columns.
+Pass your own CSV with `--input`; the first row must be the header. Any column layout works.
+Check `rejected_rows.csv` after each run: those rows usually come from unquoted commas inside a value.
