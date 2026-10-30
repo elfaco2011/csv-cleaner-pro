@@ -1,62 +1,47 @@
-# CSV Data Cleaning & Processing Automation Bot
+# CSV Cleaner Pro
 
-## 🔍 Problem
-Raw CSV files often contain inconsistent formatting, missing values, and invalid data that make analysis and automation difficult.
+## Problem
+Exported CSV files often have stray whitespace, empty rows, duplicate rows and rows with the wrong number of columns.
 
-## ✅ Solution
-This Python automation bot cleans, normalizes, and processes CSV datasets, making them ready for analysis, reporting, or further automation workflows.
+## Example output
+Input (`examples/sample_input.csv`):
 
-## 🚀 Features
-- Reads `examples/sample_input.csv`.
-- Trims whitespace from headers and cells.
-- Normalizes row length (pads or truncates columns).
-- Removes fully empty rows.
-- Removes exact duplicate rows.
-- Writes a cleaned dataset to `examples/sample_output.csv`.
+```text
+ name , email ,country 
+ Alice , alice@example.com , USA 
+Bob,bob@example.com ,USA
+Bob,bob@example.com,USA
+   , , 
+```
 
-## 🛠 Tech Stack
-- Python
-- CSV processing
-- Data validation
-- Automation workflows
+Output (`examples/sample_output.csv`), produced by running the script on the file above:
 
-## How to run (DEMO)
+```text
+name,email,country
+Alice,alice@example.com,USA
+Bob,bob@example.com,USA
+```
+
+## What it does
+- Trims whitespace from header names and from every cell.
+- Pads short rows with empty cells and truncates long rows to the header length (extra columns are dropped).
+- Removes rows where every cell is empty.
+- Removes exact duplicate rows (compared after trimming), keeping the first occurrence.
+
+## Quick start
+Tested with Python 3.11. No external dependencies (standard library only).
+
 ```bash
-cd csv-cleaner-pro
+pip install -r requirements.txt   # nothing to install, kept for consistency
 python src/main.py
 ```
 
-If `sample_input.csv` is missing, a small demo file is generated automatically.
+The cleaned file is written to `examples/sample_output.csv`.
 
-## Inputs & outputs
-- **Input:** `examples/sample_input.csv` (any messy CSV).
-- **Output:** `examples/sample_output.csv` (cleaned, deduplicated CSV).
+## Sample data
+`examples/sample_input.csv` contains a small contact list with padded values, a duplicate and an empty row.
+If the file is missing, the script recreates it before running.
 
-## Installation
-
-```bash
-pip install -r requirements.txt
-```
-
-## Project structure
-
-- `src/` – core cleaning logic (entrypoint `src/main.py`).
-- `examples/` – demo `sample_input.csv` and generated `sample_output.csv`.
-- `docs/` – space for additional documentation or screenshots.
-
-## Use cases
-
-- Cleaning exported mailing lists or CRM exports before import.
-- Normalizing messy spreadsheets from clients or team members.
-- Preparing CSV datasets for analytics or BI tools.
-
-## 📦 Ready-made Automation Pack
-If you're looking for a plug-and-play solution, check out my automation pack on Gumroad:
-👉 https://khalidelfakir.gumroad.com
-
-
-
-## 🚀 Ready-made Automation Pack
-If you're looking for a plug-and-play solution, check out my automation pack on Gumroad:
-👉 https://khalidelfakir.gumroad.com
-
+## Adapting it to your data
+Replace `examples/sample_input.csv` with your own CSV (first row must be the header), or change `INPUT_PATH` and `OUTPUT_PATH` at the top of `src/main.py`.
+Any column layout works; rows longer than the header lose their extra columns.
