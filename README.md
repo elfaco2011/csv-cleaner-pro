@@ -43,7 +43,7 @@ The cleaned file is written to `output/cleaned.csv` (git-ignored); rejected rows
 python src/main.py --input path/to/data.csv --output path/to/cleaned.csv
 ```
 
-When there are rejected rows, `rejected_rows.csv` is written next to the `--output` file.
+When there are rejected rows, `rejected_rows.csv` is written next to the `--output` file. Any `rejected_rows.csv` from a previous run in that folder is deleted at start.
 
 ## Sample data
 `examples/sample_input.csv` contains a small contact list with padded values, a duplicate and an empty row.

@@ -108,6 +108,10 @@ def _write_rejected(path: Path, header: List[str], rejected: List[tuple[int, Lis
 
 def run() -> None:
     args = _parse_args()
+    rejected_path = args.output.parent / "rejected_rows.csv"
+    if rejected_path.exists():
+        rejected_path.unlink()
+        logging.info("Removed previous %s", rejected_path)
     if args.input == DEFAULT_INPUT:
         _ensure_demo_input()
     if not args.input.exists():
@@ -131,7 +135,6 @@ def run() -> None:
     logging.info("Wrote cleaned CSV to %s (%d rows)", args.output, len(cleaned))
 
     if rejected:
-        rejected_path = args.output.parent / "rejected_rows.csv"
         _write_rejected(rejected_path, header, rejected)
         logging.warning(
             "%d row(s) have more columns than the header and were not included; see %s",
