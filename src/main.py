@@ -42,14 +42,15 @@ def _ensure_demo_input() -> None:
         writer.writerow(["   ", " ", " "])  # empty row
 
 
-def _read_rows(input_path: Path) -> tuple[List[str], List[List[str]]]:
+def _read_rows(input_path: Path) -> tuple[List[str], List[tuple[int, List[str]]]]:
+    """Return the header and (line number, row) pairs."""
     with input_path.open(newline="") as f:
         reader = csv.reader(f)
         try:
             header = next(reader)
         except StopIteration:
             return [], []
-        rows = [row for row in reader]
+        rows = [(reader.line_num, row) for row in reader]
     return header, rows
 
 
@@ -57,11 +58,14 @@ def _clean_header(header: List[str]) -> List[str]:
     return [col.strip() for col in header]
 
 
-def _normalize_row(row: List[str], size: int) -> List[str]:
+def _normalize_row(row: List[str], size: int) -> List[str] | None:
+    """Trim and pad the row to `size` cells; None if extra cells hold data."""
     row = [cell.strip() for cell in row]
     if len(row) < size:
         row = row + ["" for _ in range(size - len(row))]
     elif len(row) > size:
+        if any(row[size:]):
+            return None
         row = row[:size]
     return row
 
@@ -70,12 +74,19 @@ def _is_empty(row: List[str]) -> bool:
     return all(cell == "" for cell in row)
 
 
-def _clean_rows(header: List[str], rows: List[List[str]]) -> List[List[str]]:
+def _clean_rows(
+    header: List[str], rows: List[tuple[int, List[str]]]
+) -> tuple[List[List[str]], List[tuple[int, List[str]]]]:
+    """Return (cleaned rows, rejected (line number, raw row) pairs)."""
     cleaned: List[List[str]] = []
+    rejected: List[tuple[int, List[str]]] = []
     seen: set[tuple[str, ...]] = set()
     size = len(header)
-    for raw in rows:
+    for line, raw in rows:
         row = _normalize_row(raw, size)
+        if row is None:
+            rejected.append((line, raw))
+            continue
         if _is_empty(row):
             continue
         key = tuple(row)
@@ -83,7 +94,16 @@ def _clean_rows(header: List[str], rows: List[List[str]]) -> List[List[str]]:
             continue
         seen.add(key)
         cleaned.append(row)
-    return cleaned
+    return cleaned, rejected
+
+
+def _write_rejected(path: Path, header: List[str], rejected: List[tuple[int, List[str]]]) -> None:
+    extra = max(len(raw) for _, raw in rejected) - len(header)
+    with path.open("w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["line"] + header + [f"extra_{i}" for i in range(1, extra + 1)])
+        for line, raw in rejected:
+            writer.writerow([line] + raw)
 
 
 def run() -> None:
@@ -100,7 +120,7 @@ def run() -> None:
         return
 
     header = _clean_header(header)
-    cleaned = _clean_rows(header, rows)
+    cleaned, rejected = _clean_rows(header, rows)
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("w", newline="") as f:
@@ -109,6 +129,14 @@ def run() -> None:
         writer.writerows(cleaned)
 
     logging.info("Wrote cleaned CSV to %s (%d rows)", args.output, len(cleaned))
+
+    if rejected:
+        rejected_path = args.output.parent / "rejected_rows.csv"
+        _write_rejected(rejected_path, header, rejected)
+        logging.warning(
+            "%d row(s) have more columns than the header and were not included; see %s",
+            len(rejected), rejected_path,
+        )
 
 
 if __name__ == "__main__":
